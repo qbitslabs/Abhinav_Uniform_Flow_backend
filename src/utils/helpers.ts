@@ -1,9 +1,17 @@
-import sanitizeHtml from 'sanitize-html';
 import mongoose from 'mongoose';
 
+/** Strip tags / basic entities for free-text fields (notes, requirements). */
 export function cleanText(value?: string | null): string | undefined {
   if (value === undefined || value === null) return undefined;
-  const cleaned = sanitizeHtml(String(value), { allowedTags: [], allowedAttributes: {} }).trim();
+  const cleaned = String(value)
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
   return cleaned.length ? cleaned : undefined;
 }
 
