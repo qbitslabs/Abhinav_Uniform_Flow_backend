@@ -7,6 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import './types/auth';
 import { env } from './config/env';
+import { ensureDb } from './config/db';
 import { authenticate } from './middlewares/authMiddleware';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 
@@ -48,6 +49,15 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
+// Ensure Mongo is connected (required on Vercel serverless cold starts)
+app.use(async (_req, _res, next) => {
+  try {
+    await ensureDb();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 app.use(
   '/api',
   rateLimit({
