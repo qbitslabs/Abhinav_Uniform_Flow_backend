@@ -41,6 +41,8 @@ export async function createItem(body: Record<string, unknown>, req: Request) {
     customId,
     name: String(body.name).trim(),
     measurementFields: normalizeFields(body.measurementFields as Array<Record<string, unknown>>),
+    hasWaist: Boolean(body.hasWaist),
+    waistStartSize: body.waistStartSize ? String(body.waistStartSize).trim() : undefined,
     isActive: body.isActive !== false,
   });
   await writeAudit({
@@ -52,6 +54,8 @@ export async function createItem(body: Record<string, unknown>, req: Request) {
     details: {
       itemId: item.customId,
       name: item.name,
+      hasWaist: item.hasWaist,
+      waistStartSize: item.waistStartSize,
     },
     severity: 'SUCCESS',
   });
@@ -69,6 +73,10 @@ export async function updateItem(id: string, body: Record<string, unknown>, req:
 
   if (body.name) item.name = String(body.name).trim();
   if (body.measurementFields) item.measurementFields = normalizeFields(body.measurementFields as Array<Record<string, unknown>>);
+  if (body.hasWaist !== undefined) item.hasWaist = Boolean(body.hasWaist);
+  if (body.waistStartSize !== undefined) {
+    item.waistStartSize = body.waistStartSize ? String(body.waistStartSize).trim() : undefined;
+  }
   if (body.isActive !== undefined) item.isActive = Boolean(body.isActive);
   if ((item as { rate?: number }).rate !== undefined) {
     item.set('rate', undefined);

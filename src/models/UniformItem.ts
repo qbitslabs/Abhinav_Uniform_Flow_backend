@@ -12,6 +12,8 @@ export interface UniformItemDoc extends Document {
   customId: string;
   name: string;
   measurementFields: MeasurementField[];
+  hasWaist?: boolean;
+  waistStartSize?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -33,6 +35,8 @@ const uniformItemSchema = new Schema<UniformItemDoc>(
     customId: { type: String, required: true, unique: true },
     name: { type: String, required: true, trim: true },
     measurementFields: { type: [measurementFieldSchema], default: [] },
+    hasWaist: { type: Boolean, default: false },
+    waistStartSize: { type: String },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true, collection: 'uniform_items' }

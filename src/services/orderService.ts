@@ -106,8 +106,38 @@ export async function createOrder(body: Record<string, unknown>, req: Request) {
     ],
   });
 
+  // ── Auto-generate Manufacturing Requirement Tickets (Job Cards) ──────────
+  // Club items of same garment item so that all sizes are in one ticket/allotment:
+  // e.g. Shirt 34-5 36-5 38-5 total 15
+  const groupedByItem = new Map<string, {
+    itemId: string;
+    itemName: string;
+    totalQuantity: number;
+    sizesList: Array<{ size?: string; quantity: number }>;
+  }>();
+
   for (const item of items) {
+    const key = item.uniformItemId || item.uniformItemName;
+    const existing = groupedByItem.get(key);
+    if (!existing) {
+      groupedByItem.set(key, {
+        itemId: item.uniformItemId,
+        itemName: item.uniformItemName,
+        totalQuantity: item.quantity,
+        sizesList: [{ size: item.size || undefined, quantity: item.quantity }],
+      });
+    } else {
+      existing.totalQuantity += item.quantity;
+      existing.sizesList.push({ size: item.size || undefined, quantity: item.quantity });
+    }
+  }
+
+  for (const group of groupedByItem.values()) {
     const mfgIds = await nextMfgTicketNumber();
+    const combinedSizeStr = group.sizesList
+      .map((s) => (s.size ? `${s.size}-${s.quantity}` : `${s.quantity} pcs`))
+      .join('  ');
+
     await ManufacturingTicket.create({
       customId: mfgIds.customId,
       ticketNumber: mfgIds.ticketNumber,
@@ -115,10 +145,10 @@ export async function createOrder(body: Record<string, unknown>, req: Request) {
       orderName: order.name,
       orderNumber: order.orderNumber,
       sectorName: order.sectorName,
-      itemId: item.uniformItemId,
-      itemName: item.uniformItemName,
-      size: item.size,
-      quantity: item.quantity,
+      itemId: group.itemId,
+      itemName: group.itemName,
+      size: combinedSizeStr,
+      quantity: group.totalQuantity,
       productionStage: 'Order Received',
       specialRequirement: order.specialRequirement,
       generatedOn: new Date(),

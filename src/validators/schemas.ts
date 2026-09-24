@@ -340,6 +340,8 @@ export const createItemSchema = z.object({
   body: z.object({
     name: z.string().min(1),
     measurementFields: z.array(measurementFieldSchema).optional(),
+    hasWaist: z.coerce.boolean().optional(),
+    waistStartSize: z.string().optional(),
     isActive: z.coerce.boolean().optional(),
     supervisorPin: z.string().optional(),
   }),
@@ -350,6 +352,8 @@ export const updateItemSchema = z.object({
   body: z.object({
     name: z.string().min(1).optional(),
     measurementFields: z.array(measurementFieldSchema).optional(),
+    hasWaist: z.coerce.boolean().optional(),
+    waistStartSize: z.string().optional(),
     isActive: z.coerce.boolean().optional(),
     supervisorPin: z.string().optional(),
   }),

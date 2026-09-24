@@ -70,6 +70,8 @@ export async function seedMockData() {
     {
       customId: 'ITEM-002',
       name: 'School Pant',
+      hasWaist: true,
+      waistStartSize: '38',
       isActive: true,
       measurementFields: [
         { id: 'mf-kamar', name: 'kamar', hindiName: 'कमर', unit: 'in', defaultValue: 30 },
@@ -389,7 +391,7 @@ export async function seedMockData() {
       sectorName: 'School',
       itemId: shirtId,
       itemName: 'School Shirt',
-      size: 'M',
+      size: '34-40  36-40  38-40',
       quantity: 120,
       productionStage: 'Stitching' as const,
       generatedOn: daysFromNow(-5),
@@ -404,7 +406,7 @@ export async function seedMockData() {
       sectorName: 'School',
       itemId: pantId,
       itemName: 'School Pant',
-      size: 'M',
+      size: '32-40  34-40  36-40',
       quantity: 120,
       productionStage: 'Stitching' as const,
       generatedOn: daysFromNow(-5),
